@@ -1,0 +1,23 @@
+{
+  "name": "@feecting/discorddeva",
+  "version": "0.0.1",
+  "description": "The Discord DEVA",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/indraai/DiscordDEVA.git"
+  },
+  "keywords": [
+    "Discord",
+    "Deva"
+  ],
+  "author": "Quinn Michaels",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/indraai/DiscordDEVA/issues"
+  },
+  "homepage": "https://github.com/indraai/DiscordDEVA#readme"
+}
