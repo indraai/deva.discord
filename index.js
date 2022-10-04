@@ -210,6 +210,9 @@ const DISCORD = new Deva({
       return this.error(err);
     });
   },
+  onError(err) {
+    console.error(err);
+  },
   onInit() {
     this.prompt(this.vars.messages.init);
     const { clientId, guildId, token } = this.client.services.discord;
@@ -219,7 +222,6 @@ const DISCORD = new Deva({
     return this.modules.rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands }).then(() => {
       return this.start();
     }).catch(this.error);
-
   },
 });
 module.exports = DISCORD
