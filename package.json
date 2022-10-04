@@ -1,6 +1,6 @@
 {
   "name": "@feecting/discorddeva",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The Discord DEVA",
   "main": "index.js",
   "scripts": {
