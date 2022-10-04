@@ -11,8 +11,6 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 
-const { clientId, guildId, token } = this.client.services.discord;
-
 const cmdhymn = new SlashCommandBuilder().setName('hymn').setDescription('Retrieve a RigVeda Hymn')
   .addStringOption(opt => {
     return opt.setName('num').setDescription('The Hymn to view.').setRequired(true);
@@ -22,7 +20,7 @@ const commands = [
         cmdhymn,
       ].map(command => command.toJSON());
 
-const rest = new REST({ version: '10' }).setToken(token);
+const rest = new REST({ version: '10' }).setToken(this.client.services.discord.token);
 
 const Deva = require('@indra.ai/deva');
 const DISCORD = new Deva({
@@ -69,53 +67,8 @@ const DISCORD = new Deva({
       if (!text) return Promise.resolve('NOTHING TO SEND');
       this.func.send({text,room:'public'});
     },
-    weather(data) {
-      return this.func.say(data);
-    },
     emote(data) {
       return this.func.say(data);
-    },
-    async tweetMessage(message) {
-      let method = 'tweet',
-          media = false;
-
-      const mlen = message.content.length;
-      const {minLength, maxLength, accts} = this.vars.tweet;
-      const account = accts.find(acct => acct.id === message.author.id);
-      const cname = message.channel.name ? message.channel.name.toUpperCase() : false;
-      if (!account) return; // return if not the tweetmessage account.
-
-      if (mlen < minLength) return;   // return if min length too long
-      if (mlen > maxLength) return;   // return if max length too long
-
-      const attachments = message.attachments.map(attach => {
-        const { id, url, width, height, contentType } = attach;
-        return {
-          id,
-          width,
-          height,
-          url,
-          contentType
-        }
-      });
-
-      const messageisGif = (/^https?:\/\/.+/).test(message.content);
-      if (messageisGif) {
-        message.content = `${message.content} > #${cname} #GifBattle #SecurityPRIME #Meme #Memes`;
-      }
-      else if (attachments[0]) {
-          const attach = await axios.get(attachments[0].url, {responseType: 'arraybuffer'});
-          const prefix = "data:" + attach.headers["content-type"] + ";base64,";
-          media = Buffer.from(attach.data).toString('base64');
-          method = 'image';
-      }
-      else {
-        message.content = `${this.lib.trimText(message.content, 120)} > :tags: :id:`;
-      }
-      const log = await this.question(`#twitter ${method}:${account.screen_name} $INDRA > #${cname} > ${message.content}`, {media});
-      console.log('LOG', log);
-      this.func.send({text:log.a.text, room:'logs'});
-
     },
     onDiscordMessage(message) {
       // this.func.tweetMessage(message);
@@ -181,6 +134,7 @@ const DISCORD = new Deva({
         return resolve(this.vars.messages.sent)
       });
     },
+
     /***********
       func: hymn
       params: interaction
@@ -188,7 +142,7 @@ const DISCORD = new Deva({
     ***********/
     async hymn(interaction) {
       const hymn = interaction.options.getString('num');
-      let question = `#vedas view ${hymn}`;
+      let question = `#veda view ${hymn}`;
 
       const item = await this.question(question);
       const {data} = item.a;
@@ -251,7 +205,7 @@ const DISCORD = new Deva({
     return this.exit();
   },
   onEnter() {
-    return this.modules.client.login(token).then(loggedin => {
+    return this.modules.client.login(this.client.services.discord.token).then(loggedin => {
       return this.done();
     }).catch(err => {
       return this.error(err);
@@ -259,6 +213,10 @@ const DISCORD = new Deva({
   },
   onInit() {
     this.prompt(this.vars.messages.init);
+    const { clientId, guildId } = this.client.services.discord;
+
+
+
     return rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands }).then(() => {
       return this.start();
     }).catch(this.error);
