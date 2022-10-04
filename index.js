@@ -2,14 +2,10 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
-const {Client,Intents,MessageEmbed} = require('discord.js');
+const {Client,Intents,MessageEmbed, REST, Routes, SlashCommandBuilder, GatewayIntentBits} = require('discord.js');
 
 const data_path = path.join(__dirname, 'data.json');
 const {agent,vars} = require(data_path).data;
-
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
 
 const cmdhymn = new SlashCommandBuilder().setName('hymn').setDescription('Retrieve a RigVeda Hymn')
   .addStringOption(opt => {
@@ -186,7 +182,7 @@ const DISCORD = new Deva({
     },
   },
   onStart() {
-    this.modules.client = new Client({intents:[Intents.FLAGS.GUILDS,Intents.FLAGS.GUILD_MESSAGES]});
+    this.modules.client = new Client({intents:[GatewayIntentBits.Guilds]});
     this.modules.client.on('ready', this.func.onDiscordReady)
       .on('messageCreate', this.func.onDiscordMessage)
       .on('guildMemberAdd', this.func.onGuildMemberAdd)
