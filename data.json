@@ -29,8 +29,8 @@
         "speed": 1
       },
       "profile": {
-        "emoji": "https://deva.space/cdn/glow/discord.png",
-        "avatar": "https://deva.space/cdn/glow/discord.png",
+        "emoji": "/public/devas/discord/emoji.png",
+        "avatar": "/public/devas/discord/emoji.png",
         "background": "/assets/img/indra-background.jpg",
         "describe": "The Discord Deva ",
         "gender": "M"
