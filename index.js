@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
-const {Client,Intents,MessageEmbed, REST, Routes, SlashCommandBuilder, GatewayIntentBits} = require('discord.js');
+const {Client, Intents, EmbedBuilder, REST, Routes, SlashCommandBuilder, GatewayIntentBits} = require('discord.js');
 
 const data_path = path.join(__dirname, 'data.json');
 const {agent,vars} = require(data_path).data;
@@ -144,12 +144,12 @@ const DISCORD = new Deva({
 
       let _embed;
       if (!data.title) {
-        _embed = new MessageEmbed()
+        _embed = new EmbedBuilder()
           .setColor('#336699')
           .setDescription(item.a.text);
       }
       else {
-        _embed = new MessageEmbed()
+        _embed = new EmbedBuilder()
           .setColor('#336699')
           .setTitle(data.title)
           .setURL(`http://indra.church/rigveda/hymns/${data.key}.html`)
