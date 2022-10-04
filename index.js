@@ -212,9 +212,9 @@ const DISCORD = new Deva({
   },
   onInit() {
     this.prompt(this.vars.messages.init);
-    const { clientId, guildId } = this.client.services.discord;
+    const { clientId, guildId, token } = this.client.services.discord;
 
-    const this.modules.rest = new REST({ version: '10' }).setToken(this.client.services.discord.token);
+    this.modules.rest = new REST({ version: '10' }).setToken(token);
 
     return this.modules.rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands }).then(() => {
       return this.start();
