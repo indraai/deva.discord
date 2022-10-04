@@ -4,9 +4,6 @@ const path = require('path');
 const axios = require('axios');
 const {Client,Intents,MessageEmbed} = require('discord.js');
 
-const auth_path = path.join(__dirname, '.auth.json');
-const auth = require(auth_path).data;
-
 const data_path = path.join(__dirname, 'data.json');
 const {agent,vars} = require(data_path).data;
 
