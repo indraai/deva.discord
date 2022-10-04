@@ -221,7 +221,9 @@ const DISCORD = new Deva({
 
     return this.modules.rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands }).then(() => {
       return this.start();
-    }).catch(this.error);
+    }).catch(err => {
+      return this.error(err);
+    });
   },
 });
 module.exports = DISCORD
