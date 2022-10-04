@@ -20,8 +20,6 @@ const commands = [
         cmdhymn,
       ].map(command => command.toJSON());
 
-const rest = new REST({ version: '10' }).setToken(this.client.services.discord.token);
-
 const Deva = require('@indra.ai/deva');
 const DISCORD = new Deva({
   agent: {
@@ -53,6 +51,7 @@ const DISCORD = new Deva({
   },
   modules: {
     client: false,
+    rest: false,
   },
   deva: {},
   func: {
@@ -215,9 +214,9 @@ const DISCORD = new Deva({
     this.prompt(this.vars.messages.init);
     const { clientId, guildId } = this.client.services.discord;
 
+    const this.modules.rest = new REST({ version: '10' }).setToken(this.client.services.discord.token);
 
-
-    return rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands }).then(() => {
+    return this.modules.rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands }).then(() => {
       return this.start();
     }).catch(this.error);
 
