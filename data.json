@@ -1,0 +1,82 @@
+{
+  "name": "Discord Deva Agent File",
+  "describe": "The main Agent file for Discord Deva Deva.",
+  "copyright": "Copyright (c)2021 Quinn Michaels. All rights reserved.",
+  "data": {
+    "agent": {
+      "uid": "5594827423516",
+      "key": "discord",
+      "name": "Discord Deva",
+      "describe": "The Discord Deva ",
+      "prompt": {
+        "emoji": "💬",
+        "text": "discord",
+        "colors": {
+          "label": {
+            "R": 0,
+            "G": 150,
+            "B": 255
+          },
+          "text": {
+            "R": 101,
+            "G": 192,
+            "B": 255
+          }
+        }
+      },
+      "voice": {
+        "speech": "Alex",
+        "speed": 1
+      },
+      "profile": {
+        "emoji": "https://deva.space/cdn/glow/discord.png",
+        "avatar": "https://deva.space/cdn/glow/discord.png",
+        "background": "/assets/img/indra-background.jpg",
+        "describe": "The Discord Deva ",
+        "gender": "M"
+      }
+    },
+    "vars": {
+      "messages": {
+        "init": "🟠 INIT",
+        "start": "🔵 START",
+        "enter": "🟢 ENTER",
+        "stop": "🔴 STOP",
+        "exit": "🟡 EXIT",
+        "done": "🟣 DONE",
+        "error": "💣 ERROR!",
+        "ready": "✅ READY",
+        "loggedout": "🛑 LOGGED OUT",
+        "send": "📜 MESSAGE SENT"
+      },
+      "tweet": {
+        "admin": "302591850223501312",
+        "accts": [
+          {
+            "id": "302591850223501312",
+            "screen_name": "quinnmichaels"
+          },
+          {
+            "id": "801247451821637683",
+            "screen_name": "securitydeva"
+          }
+        ],
+        "maxLength": 140,
+        "minLength": 50
+      },
+      "commands": [
+        {
+          "name": "hymn",
+          "describe": "Retrieve a hymn from the RigVeda",
+          "options": [
+            {
+              "name": "num",
+              "describe": "The Hymn you would like to read.",
+              "required": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
