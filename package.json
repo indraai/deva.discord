@@ -1,5 +1,5 @@
 {
-  "name": "@feecting/discorddeva",
+  "name": "@indra.ai/discorddeva",
   "version": "0.0.11",
   "description": "The Discord DEVA",
   "main": "index.js",
@@ -20,7 +20,7 @@
     "url": "https://github.com/indraai/DiscordDEVA/issues"
   },
   "dependencies": {
-    "@feecting/deva": "^1.0.25",
+    "@indra.ai/deva": "^1.0.25",
     "discord.js": "^14.5.0"
   },
   "homepage": "https://github.com/indraai/DiscordDEVA#readme"
