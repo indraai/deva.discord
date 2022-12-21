@@ -3,19 +3,26 @@
 
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
 const {Client, Intents, EmbedBuilder, REST, Routes, SlashCommandBuilder, GatewayIntentBits} = require('discord.js');
 
 const data_path = path.join(__dirname, 'data.json');
 const {agent,vars} = require(data_path).data;
 
-const cmdhymn = new SlashCommandBuilder().setName('hymn').setDescription('Retrieve a RigVeda Hymn')
+
+const cmd = new SlashCommandBuilder().setName('veda').setDescription('Retrieve the Vedas')
   .addStringOption(opt => {
-    return opt.setName('num').setDescription('The Hymn to view.').setRequired(true);
+    return opt.setName('book')
+              .setDescription('Get a book from the Vedas.')
+              .setRequired(false);
+  })
+  .addStringOption(opt => {
+    return opt.setName('view')
+              .setDescription('View a hymn from the Vedas.')
+              .setRequired(false);
   });
 
 const commands = [
-        cmdhymn,
+        cmd,
       ].map(command => command.toJSON());
 
 const Deva = require('@indra.ai/deva');
@@ -132,33 +139,63 @@ const DISCORD = new Deva({
       });
     },
 
+
     /***********
       func: hymn
       params: interaction
       describe: async hymn function relays an interaction to call a hymn from the vedas deva.
     ***********/
-    async hymn(interaction) {
-      const hymn = interaction.options.getString('num');
-      let question = `#veda view ${hymn}`;
+    async veda(interaction) {
+      const book = interaction.options.getString('book');
+      const view = interaction.options.getString('view');
+      let text;
+      let question = `#veda books`;
+      if (book) question = `#veda book ${book}`;
+      else if (view) question = `#veda view ${view}`;
 
       const item = await this.question(question);
       const {data} = item.a;
-
-      let _embed;
-      if (!data.title) {
-        _embed = new EmbedBuilder()
-          .setColor('#336699')
-          .setDescription(item.a.text);
+      if (view) {
+        console.log(data);
+        text = [
+          `**${data.title}**`,
+          data.feecting.replace(/p\:/g, '\n')
+        ].join('\n');
+      }
+      else if (book) {
+        text = data.map((itm,idx) => {
+          return `${itm.key} - ${itm.title}`;
+        }).join('\n');
       }
       else {
-        _embed = new EmbedBuilder()
-          .setColor('#336699')
-          .setTitle(data.title)
-          .setURL(`http://indra.church/rigveda/hymns/${data.key}.html`)
-          .setDescription(data.feecting.replace(/p:/g, ''));
+        text = data.map((itm,idx) => {
+          const mk = idx + 1;
+          return `${itm.key} - ${itm.title}`;
+        }).join('\n')
       }
-
-      await interaction.reply({embeds:[_embed], ephemeral: false});
+      const dropoff = 1500
+      if (text.length < dropoff) {
+        await interaction.reply({ content:text, ephemeral: false });
+      }
+      else {
+        // here we have to split the message into 2000 character lines
+        const replies = [];
+        let temp = [];
+        let t = 0;
+        text.split('\n').forEach((itm,idx) => {
+          t = t + itm.length;
+          if (t < dropoff) {
+            temp.push(itm);
+          }
+          else {
+            replies.push(temp.join('\n'));
+            t = itm.length;
+            temp = [];
+            temp.push(itm);
+          }
+        });
+        await interaction.reply({ content:replies[0], ephemeral: false });
+      }
     },
 
   },
@@ -217,7 +254,7 @@ const DISCORD = new Deva({
 
     this.modules.rest = new REST({ version: '10' }).setToken(token);
 
-    return this.modules.rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands }).then(() => {
+    return this.modules.rest.put(Routes.applicationCommands(clientId), { body: commands }).then(() => {
       return this.start();
     }).catch(err => {
       return this.error(err);

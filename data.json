@@ -66,8 +66,23 @@
       },
       "commands": [
         {
-          "name": "hymn",
-          "describe": "Retrieve a hymn from the RigVeda",
+          "name": "books",
+          "describe": "Retrieve the Veda Books."
+        },
+        {
+          "name": "book",
+          "describe": "Retrieve a Book from the Vedas.",
+          "options": [
+            {
+              "name": "num",
+              "describe": "The book you would like to read.",
+              "required": true
+            }
+          ]
+        },
+        {
+          "name": "view",
+          "describe": "Retrieve a Hymn from the Vedas",
           "options": [
             {
               "name": "num",
