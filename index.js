@@ -9,7 +9,7 @@ const data_path = path.join(__dirname, 'data.json');
 const {agent,vars} = require(data_path).data;
 
 
-const cmd = new SlashCommandBuilder().setName('veda').setDescription('Retrieve the Vedas')
+const icmd = new SlashCommandBuilder().setName('veda').setDescription('Retrieve the Vedas')
   .addStringOption(opt => {
     return opt.setName('book')
               .setDescription('Get a book from the Vedas.')
@@ -21,10 +21,10 @@ const cmd = new SlashCommandBuilder().setName('veda').setDescription('Retrieve t
               .setRequired(false);
   });
 
-const commands = [
-        cmd,
-      ].map(command => command.toJSON());
 
+const commands = {
+  indra: [icmd].map(command => command.toJSON()),
+};
 const Deva = require('@indra.ai/deva');
 const DISCORD = new Deva({
   agent: {
@@ -35,6 +35,7 @@ const DISCORD = new Deva({
     prompt: agent.prompt,
     voice: agent.voice,
     profile: agent.profile,
+    discord: {},
     translate(input) {
       return input.trim();
     },
@@ -74,23 +75,31 @@ const DISCORD = new Deva({
     emote(data) {
       return this.func.say(data);
     },
-    onDiscordMessage(message) {
+    onDiscordMessage(opts) {
       // this.func.tweetMessage(message);
+      return;
     },
-    onDiscordWarn(warning) {},
-    onDiscordError(error) {
-      console.error(error);
+    onDiscordWarn(opts) {
+      return;
     },
-    onGuildMemberAdd(member) {},
-    onDiscordReady() {
-      const _user = this.modules.client.user;
-      this.agent.discord = {
+    onDiscordError(opts) {
+      console.error(opts.error);
+      return;
+    },
+    onGuildMemberAdd(opts) {
+      return;
+    },
+    onDiscordReady(opts) {
+      const {key, ready} = opts;
+      const _user = this.modules[key].client.user;
+      this.agent.discord[key] = {
         id: _user.id,
         username: _user.username,
         discriminator: _user.discriminator,
         avatar: _user.displayAvatarURL
       };
-      this.prompt(this.vars.messages.ready)
+      this.prompt(`${agent} - this.vars.messages.ready`)
+      return;
     },
     /***********
       func: send
@@ -99,9 +108,9 @@ const DISCORD = new Deva({
     ***********/
     send(opts) {
       if (!opts) return;
-      const {text, room} = opts;
+      const {key, text, room} = opts;
       let _text = text;
-      const channels = this.modules.client.channels.cache.filter(ch => ch.name === room);
+      const channels = this.modules[key].client.channels.cache.filter(ch => ch.name === room);
       // const buffer = message.buffer ? new this.modules.DiscordServer.Attachment(message.buffer, 'attachment.png') : false;
 
       const entities = {
@@ -202,6 +211,7 @@ const DISCORD = new Deva({
   methods: {
     send(packet) {
       return this.func.send({
+        key: packet.q.meta.params[2] || this.vars.active_agent,
         text: packet.q.text || false,
         room: packet.q.meta.params[1] || 'public',
       });
@@ -220,45 +230,65 @@ const DISCORD = new Deva({
       });
     },
   },
-  onStart() {
-    this.modules.client = new Client({intents:[GatewayIntentBits.Guilds]});
-    this.modules.client.on('ready', this.func.onDiscordReady)
-      .on('messageCreate', this.func.onDiscordMessage)
-      .on('guildMemberAdd', this.func.onGuildMemberAdd)
-      .on('error', this.func.onDiscordError)
-      .on('warn', this.func.onDiscordWarn)
-      .on('interactionCreate', async interaction => {
-      	if (!interaction.isCommand()) return;
-      	const { commandName } = interaction;
-        if (this.func[commandName]) this.func[commandName](interaction);
-      });
-    return this.enter();
-  },
-  onStop() {
-    this.modules.client.destroy();
-    return this.exit();
-  },
-  onEnter() {
-    return this.modules.client.login(this.client.services.discord.token).then(loggedin => {
-      return this.done();
-    }).catch(err => {
-      return this.error(err);
-    });
+  async onStop() {
+    try {
+      for (const acct of this.client.services.discord) {
+        // await this.modules[acct.key].client.destroy();
+      }
+    } catch (e) {
+      return this.error(e);
+    } finally {
+      return this.exit();
+    }
   },
   onError(err) {
     console.error(err);
   },
-  onInit() {
+  async onInit() {
     this.prompt(this.vars.messages.init);
-    const { clientId, guildId, token } = this.client.services.discord;
+    const { discord } = this.client.services;
+    this.vars.active_agent = discord[0].key;
+    let ukey;
 
-    this.modules.rest = new REST({ version: '10' }).setToken(token);
+    try {
+      for (const acct in this.client.services.discord) {
+        const {key,token,clientId} = this.client.services.discord[acct];
+        this.agent.discord[key] = {};
+        this.modules[key] ={
+          rest: new REST({ version: '10' }).setToken(token),
+          client: new Client({intents:[GatewayIntentBits.Guilds]}),
+        }
+        if (commands[key]) await this.modules[key].rest.put(Routes.applicationCommands(clientId), { body: commands[key] });
+        await this.modules[key].client.login(token);
 
-    return this.modules.rest.put(Routes.applicationCommands(clientId), { body: commands }).then(() => {
+        this.modules[key].client.on('ready', ready => {
+            return this.func.onDiscordReady({key,ready});
+          })
+          .on('messageCreate', message => {
+            return this.func.onDiscordMessage({key,message});
+          })
+          .on('guildMemberAdd', member => {
+            return this.func.onGuildMemberAdd({key,member});
+          })
+          .on('error', err => {
+            return this.func.onDiscordError({key,err});
+          })
+          .on('warn', warn => {
+            return this.func.onDiscordWarn({key,warn})
+          })
+          .on('interactionCreate', async interaction => {
+          	if (!interaction.isCommand()) return;
+          	const { commandName } = interaction;
+            if (this.func[commandName]) this.func[commandName](interaction);
+          });
+
+      }
+    } catch (e) {
+      console.log('KEY', ukey);
+      return this.error(e);
+    } finally {
       return this.start();
-    }).catch(err => {
-      return this.error(err);
-    });
+    }
   },
 });
 module.exports = DISCORD
