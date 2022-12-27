@@ -98,7 +98,7 @@ const DISCORD = new Deva({
         discriminator: _user.discriminator,
         avatar: _user.displayAvatarURL
       };
-      this.prompt(`${agent} - this.vars.messages.ready`)
+      this.prompt(`${this.vars.messages.ready} > ${key}`);
       return;
     },
     /***********
@@ -233,8 +233,7 @@ const DISCORD = new Deva({
   async onStop() {
     try {
       for (const acct of this.client.services.discord) {
-        const {key} = this.client.services.discord[acct];
-        await this.modules[key].client.destroy();
+        await this.modules[acct.key].client.destroy();
       }
     } catch (e) {
       return this.error(e);
