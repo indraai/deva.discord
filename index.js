@@ -233,7 +233,8 @@ const DISCORD = new Deva({
   async onStop() {
     try {
       for (const acct of this.client.services.discord) {
-        // await this.modules[acct.key].client.destroy();
+        const {key} = this.client.services.discord[acct];
+        await this.modules[key].client.destroy();
       }
     } catch (e) {
       return this.error(e);
