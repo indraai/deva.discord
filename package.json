@@ -1,6 +1,6 @@
 {
   "name": "@indra.ai/discorddeva",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "The Discord DEVA",
   "main": "index.js",
   "scripts": {
