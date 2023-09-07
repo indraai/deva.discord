@@ -4,10 +4,8 @@
   "copyright": "Copyright (c)2021 Quinn Michaels. All rights reserved.",
   "data": {
     "agent": {
-      "uid": "5594827423516",
+      "id": 5594827423516,
       "key": "discord",
-      "name": "Discord Deva",
-      "describe": "The Discord Deva ",
       "prompt": {
         "emoji": "💬",
         "text": "discord",
@@ -24,16 +22,14 @@
           }
         }
       },
-      "voice": {
-        "speech": "Alex",
-        "speed": 1
-      },
       "profile": {
+        "name": "Discord Deva",
+        "describe": "The Discord Deva ",
         "emoji": "/public/devas/discord/emoji.png",
         "avatar": "/public/devas/discord/avatar.png",
         "background": "/assets/img/indra-background.jpg",
-        "describe": "The Discord Deva ",
-        "gender": "M"
+        "gender": "M",
+        "voice": "Brian"
       }
     },
     "vars": {
@@ -49,49 +45,7 @@
         "loggedout": "🛑 LOGGED OUT",
         "send": "📜 MESSAGE SENT"
       },
-      "tweet": {
-        "admin": "302591850223501312",
-        "accts": [
-          {
-            "id": "302591850223501312",
-            "screen_name": "quinnmichaels"
-          },
-          {
-            "id": "801247451821637683",
-            "screen_name": "securitydeva"
-          }
-        ],
-        "maxLength": 140,
-        "minLength": 50
-      },
-      "commands": [
-        {
-          "name": "books",
-          "describe": "Retrieve the Veda Books."
-        },
-        {
-          "name": "book",
-          "describe": "Retrieve a Book from the Vedas.",
-          "options": [
-            {
-              "name": "num",
-              "describe": "The book you would like to read.",
-              "required": true
-            }
-          ]
-        },
-        {
-          "name": "view",
-          "describe": "Retrieve a Hymn from the Vedas",
-          "options": [
-            {
-              "name": "num",
-              "describe": "The Hymn you would like to read.",
-              "required": true
-            }
-          ]
-        }
-      ]
+      "accts": {}
     }
   }
 }

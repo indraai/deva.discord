@@ -3,6 +3,21 @@
 
 const fs = require('fs');
 const path = require('path');
+const package = require('./package.json');
+const info = {
+  id: package.id,
+  name: package.name,
+  version: package.version,
+  describe: package.description,
+  dir: __dirname,
+  url: package.homepage,
+  git: package.repository.url,
+  bugs: package.bugs.url,
+  license: package.license,
+  author: package.author,
+  copyright: package.copyright,
+};
+
 const {Client, Intents, EmbedBuilder, REST, Routes, SlashCommandBuilder, GatewayIntentBits} = require('discord.js');
 
 const data_path = path.join(__dirname, 'data.json');
@@ -27,34 +42,15 @@ const commands = {
 };
 const Deva = require('@indra.ai/deva');
 const DISCORD = new Deva({
-  agent: {
-    uid: agent.uid,
-    key: agent.key,
-    name: agent.name,
-    describe: agent.describe,
-    prompt: agent.prompt,
-    voice: agent.voice,
-    profile: agent.profile,
-    discord: {},
-    translate(input) {
-      return input.trim();
-    },
-    parse(input) {
-      return input.trim();
-    }
-  },
+  info,
+  agent,
   vars,
-  listeners: {
-    system(packet) {
-      // log system packets to discord.
-      if (!this.active) return;
-      if (!packet) return;
-      return;
-      const {state,pattern} = packet.data;
-      const relay = state && this.func[state] && typeof this.func[state] === 'function';
-      if (relay) this.func[state](packet.data);
-    }
+  utils: {
+    translate(input) {return input.trim()},
+    parse(input) {return input.trim()},
+    process(input) {return input.trim()},
   },
+  listeners: {},
   modules: {
     client: false,
     rest: false,
@@ -76,8 +72,15 @@ const DISCORD = new Deva({
       return this.func.say(data);
     },
     onDiscordMessage(opts) {
-      // this.func.tweetMessage(message);
-      return;
+      return new Promise((resolve, reject) => {
+        for (let [key,value] of opts.message.mentions.users) {
+          const user = value.username === this.vars.accts[opts.key].username;
+          const descrim = value.discriminator === this.vars.accts[opts.key].discriminator;
+          const isAuthor = opts.message.author.id === value.id
+          if (user && descrim && !isAuthor) this.func.reply(opts);
+        }
+        return resolve(true)
+      });
     },
     onDiscordWarn(opts) {
       return;
@@ -92,7 +95,7 @@ const DISCORD = new Deva({
     onDiscordReady(opts) {
       const {key, ready} = opts;
       const _user = this.modules[key].client.user;
-      this.agent.discord[key] = {
+      this.vars.accts[key] = {
         id: _user.id,
         username: _user.username,
         discriminator: _user.discriminator,
@@ -148,6 +151,19 @@ const DISCORD = new Deva({
       });
     },
 
+    /**************
+    func: reply
+    params: opts
+    describe: Reply to a message from the on message handler.
+    ***************/
+    reply(opts) {
+      let content = opts.message.content;
+      this.question(`${this.askChr}${opts.key} reply ${opts.message.content}`).then(chat => {
+        opts.message.reply(chat.a.text);
+      }).catch(err => {
+        console.log('REPLY ERROR', err);
+      });
+    },
 
     /***********
       func: hymn
@@ -165,7 +181,6 @@ const DISCORD = new Deva({
       const item = await this.question(question);
       const {data} = item.a;
       if (view) {
-        console.log(data);
         text = [
           `**${data.title}**`,
           data.feecting.replace(/p\:/g, '\n')
@@ -244,50 +259,54 @@ const DISCORD = new Deva({
   onError(err) {
     console.error(err);
   },
-  async onInit() {
+  async onInit(data) {
     this.prompt(this.vars.messages.init);
-    const { discord } = this.client.services;
-    this.vars.active_agent = discord[0].key;
-    let ukey;
+    const { personal } = this.security();
+    this.vars.active_agent = personal[0].key;
 
     try {
-      for (const acct in this.client.services.discord) {
-        const {key,token,clientId} = this.client.services.discord[acct];
-        this.agent.discord[key] = {};
+      for (const acct of personal) {
+        const {key,token,clientId} = acct;
+        this.vars.accts[key] = {};
         this.modules[key] ={
           rest: new REST({ version: '10' }).setToken(token),
-          client: new Client({intents:[GatewayIntentBits.Guilds]}),
+          client: new Client({intents:[
+            GatewayIntentBits.Guilds,
+        		GatewayIntentBits.GuildMessages,
+        		GatewayIntentBits.MessageContent,
+        		GatewayIntentBits.GuildMembers,
+          ]}),
+
         }
         if (commands[key]) await this.modules[key].rest.put(Routes.applicationCommands(clientId), { body: commands[key] });
         await this.modules[key].client.login(token);
 
         this.modules[key].client.on('ready', ready => {
-            return this.func.onDiscordReady({key,ready});
-          })
-          .on('messageCreate', message => {
-            return this.func.onDiscordMessage({key,message});
-          })
-          .on('guildMemberAdd', member => {
-            return this.func.onGuildMemberAdd({key,member});
-          })
-          .on('error', err => {
-            return this.func.onDiscordError({key,err});
-          })
-          .on('warn', warn => {
-            return this.func.onDiscordWarn({key,warn})
-          })
-          .on('interactionCreate', async interaction => {
-          	if (!interaction.isCommand()) return;
-          	const { commandName } = interaction;
-            if (this.func[commandName]) this.func[commandName](interaction);
-          });
+          return this.func.onDiscordReady({key,ready});
+        });
+        await this.modules[key].client.on('messageCreate', message => {
+          return this.func.onDiscordMessage({key,message});
+        });
+        await this.modules[key].client.on('guildMemberAdd', member => {
+          return this.func.onGuildMemberAdd({key,member});
+        });
+        await this.modules[key].client.on('error', err => {
+          return this.func.onDiscordError({key,err});
+        })
+        await this.modules[key].client.on('warn', warn => {
+          return this.func.onDiscordWarn({key,warn})
+        });
+        await this.modules[key].client.on('interactionCreate', async interaction => {
+        	if (!interaction.isCommand()) return;
+        	const { commandName } = interaction;
+          if (this.func[commandName]) this.func[commandName](interaction);
+        });
 
       }
     } catch (e) {
-      console.log('KEY', ukey);
       return this.error(e);
     } finally {
-      return this.start();
+      return this.start(data);
     }
   },
 });
