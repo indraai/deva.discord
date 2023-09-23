@@ -256,9 +256,6 @@ const DISCORD = new Deva({
       return this.exit();
     }
   },
-  onError(err) {
-    console.error(err);
-  },
   async onInit(data) {
     this.prompt(this.vars.messages.init);
     const { personal } = this.security();
