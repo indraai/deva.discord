@@ -101,7 +101,6 @@ const DISCORD = new Deva({
         discriminator: _user.discriminator,
         avatar: _user.displayAvatarURL
       };
-      this.prompt(`${this.vars.messages.ready} > ${key}`);
       return;
     },
     /***********
@@ -125,6 +124,7 @@ const DISCORD = new Deva({
       // strange things
       return new Promise((resolve, reject) => {
         channels.forEach((channel,key) => {
+
           if (entities.mentions) entities.mentions.forEach(mention => {
             const username = mention.replace(/@/g, '').toLowerCase();
             const usernameReg = new RegExp(mention, 'g');
@@ -157,11 +157,49 @@ const DISCORD = new Deva({
     describe: Reply to a message from the on message handler.
     ***************/
     reply(opts) {
-      let content = opts.message.content;
-      this.question(`${this.askChr}${opts.key} reply ${opts.message.content}`).then(chat => {
+
+      const {mentions, content, author, channel} = opts.message;
+      const {guild} = channel;
+
+      let msg = content;
+
+      const header = [
+        '::begin:header',
+        `info: You are talking with @${author.globalName} in room #${channel.name} about ${channel.topic}`,
+        '::end:header',
+      ].join('\n');
+
+      const channels = guild.channels.cache.map(channel => {
+        const {id, name} = channel;
+        const msgReg = new RegExp(`<#${id}>`, 'g');
+        msg = msg.replace(msgReg, `#${name}`);
+        return {
+          id,
+          name,
+        }
+      });
+
+      const members = guild.members.cache.map(member => {
+        const {id, globalName, username} = member.user;
+        const name = globalName || username;
+        const msgReg = new RegExp(`<@${id}>`, 'g');
+        msg = msg.replace(msgReg, `@${name}`);
+        return {
+          id,
+          name,
+        }
+      });
+
+      channel.sendTyping();
+      msg = `${msg}\nlimit: Respond with 150 words or less.`,
+
+      this.question(`${this.askChr}${opts.key} reply ${msg}`, {
+        header,
+      }).then(chat => {
         opts.message.reply(chat.a.text);
       }).catch(err => {
-        console.log('REPLY ERROR', err);
+        opts.message.reply(this.vars.messages.error);
+        this.error(err, opts);
       });
     },
 
@@ -245,19 +283,19 @@ const DISCORD = new Deva({
       });
     },
   },
-  async onStop() {
+  async onStop(data) {
     try {
-      for (const acct of this.client.services.discord) {
+      const { personal} = this.security();
+      for (const acct of personal) {
         await this.modules[acct.key].client.destroy();
       }
     } catch (e) {
       return this.error(e);
     } finally {
-      return this.exit();
+      return this.exit(data);
     }
   },
   async onInit(data) {
-    this.prompt(this.vars.messages.init);
     const { personal } = this.security();
     this.vars.active_agent = personal[0].key;
 

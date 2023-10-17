@@ -40,8 +40,8 @@
         "stop": "🔴 STOP",
         "exit": "🟡 EXIT",
         "done": "🟣 DONE",
-        "error": "💣 ERROR!",
-        "ready": "✅ READY",
+        "error": "💣 Discord Error!",
+        "ready": "✅ Discord Ready",
         "loggedout": "🛑 LOGGED OUT",
         "send": "📜 MESSAGE SENT"
       },
