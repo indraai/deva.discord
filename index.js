@@ -191,7 +191,6 @@ const DISCORD = new Deva({
       });
 
       channel.sendTyping();
-      msg = `${msg}\nlimit: Respond with 150 words or less.`,
 
       this.question(`${this.askChr}${opts.key} reply ${msg}`, {
         header,
