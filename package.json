@@ -1,7 +1,7 @@
 {
   "id": 5594827423516,
   "name": "@indra.ai/deva.discord",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "The Discord DEVA",
   "main": "index.js",
   "type": "module",
