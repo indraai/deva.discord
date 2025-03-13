@@ -1,14 +1,14 @@
 {
   "name": "Discord Deva Agent File",
   "describe": "The main Agent file for Discord Deva Deva.",
-  "copyright": "Copyright (c)2021 Quinn Michaels. All rights reserved.",
-  "data": {
+  "copyright": "Copyright (c)2025 Quinn Michaels. All rights reserved.",
+  "DATA": {
     "agent": {
       "id": 5594827423516,
       "key": "discord",
       "prompt": {
         "emoji": "💬",
-        "text": "discord",
+        "text": "Discord",
         "colors": {
           "label": {
             "R": 0,
@@ -24,12 +24,15 @@
       },
       "profile": {
         "name": "Discord Deva",
-        "describe": "The Discord Deva ",
+        "gender": "DEVA",
+        "pronounds": "He, Him",
+        "owner": "Quinn Michaels",
+        "creator": "Quinn Michaels",
+        "describe": "The Discord Deva manages the Discord Server features and connections for the entties in the Deva.world multi-agent system",
         "emoji": "/public/devas/discord/emoji.png",
         "avatar": "/public/devas/discord/avatar.png",
-        "background": "/assets/img/indra-background.jpg",
-        "gender": "M",
-        "voice": "Brian"
+        "background": "/public/devas/indra/background.jpg",
+        "voice": "ash"
       }
     },
     "vars": {
@@ -43,7 +46,20 @@
         "error": "💣 Discord Error!",
         "ready": "✅ Discord Ready",
         "loggedout": "🛑 LOGGED OUT",
-        "send": "📜 MESSAGE SENT"
+        "send": "📜 MESSAGE SENT",
+        "ready": "⭐️ Discord Deva Ready!"
+      },
+      "ask": {
+        "max_tokens": 150,
+        "history": []
+      },
+      "context": {
+        "uid": "generating uid",
+        "status": "getting status",
+        "info": "getting info",
+        "feature": "accessing feature",
+        "issue": "has issues",
+        "help": "asking for help"
       },
       "accts": {}
     }

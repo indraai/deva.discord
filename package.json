@@ -1,27 +1,30 @@
 {
-  "name": "@indra.ai/discorddeva",
-  "version": "0.0.22",
+  "id": 5594827423516,
+  "name": "@indra.ai/deva.discord",
+  "version": "0.0.0",
   "description": "The Discord DEVA",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/indraai/DiscordDEVA.git"
+    "url": "git+ssh://git@github.com/indraai/deva.discord.git"
   },
   "keywords": [
     "Discord",
     "Deva"
   ],
   "author": "Quinn Michaels",
+  "owner": "Quinn Michaels",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/indraai/DiscordDEVA/issues"
+    "url": "https://github.com/indraai/deva.discord/issues"
   },
   "dependencies": {
-    "@indra.ai/deva": "^1.2.10",
-    "discord.js": "^14.13.0"
+    "@indra.ai/deva": "^1.4.10",
+    "discord.js": "^14.18.0"
   },
-  "homepage": "https://github.com/indraai/DiscordDEVA#readme"
+  "homepage": "https://deva.space/devas/discord"
 }

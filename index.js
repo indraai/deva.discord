@@ -1,28 +1,33 @@
-// Copyright (c)2021 Quinn Michaels
+// Copyright (c)2025 Quinn Michaels
 //  Discord Deva
 
-const fs = require('fs');
-const path = require('path');
-const package = require('./package.json');
+import Deva from '@indra.ai/deva';
+import pkg from './package.json' with {type:'json'};
+
+import data from './data.json' with {type:'json'};
+const {agent,vars} = data.DATA;
+
+// set the __dirname
+import {dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';    
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const info = {
-  id: package.id,
-  name: package.name,
-  version: package.version,
-  describe: package.description,
+  id: pkg.id,
+  name: pkg.name,
+  version: pkg.version,
+  describe: pkg.description,
   dir: __dirname,
-  url: package.homepage,
-  git: package.repository.url,
-  bugs: package.bugs.url,
-  license: package.license,
-  author: package.author,
-  copyright: package.copyright,
+  url: pkg.homepage,
+  git: pkg.repository.url,
+  bugs: pkg.bugs.url,
+  license: pkg.license,
+  author: pkg.author,
+  owner: pkg.owner,
+  copyright: pkg.copyright,
 };
 
-const {Client, Intents, EmbedBuilder, REST, Routes, SlashCommandBuilder, GatewayIntentBits} = require('discord.js');
-
-const data_path = path.join(__dirname, 'data.json');
-const {agent,vars} = require(data_path).data;
-
+import {Client, EmbedBuilder, REST, Routes, SlashCommandBuilder, GatewayIntentBits} from 'discord.js';
 
 const icmd = new SlashCommandBuilder().setName('veda').setDescription('Retrieve the Vedas')
   .addStringOption(opt => {
@@ -40,7 +45,7 @@ const icmd = new SlashCommandBuilder().setName('veda').setDescription('Retrieve 
 const commands = {
   indra: [icmd].map(command => command.toJSON()),
 };
-const Deva = require('@indra.ai/deva');
+
 const DISCORD = new Deva({
   info,
   agent,
@@ -51,10 +56,7 @@ const DISCORD = new Deva({
     process(input) {return input.trim()},
   },
   listeners: {},
-  modules: {
-    client: false,
-    rest: false,
-  },
+  modules: {},
   deva: {},
   func: {
     /***********
@@ -191,8 +193,8 @@ const DISCORD = new Deva({
       });
 
       channel.sendTyping();
-
-      this.question(`${this.askChr}${opts.key} reply ${msg}`, {
+      this.prompt(msg);
+      this.question(`${this.askChr}${opts.key} ask ${msg}`, {
         header,
       }).then(chat => {
         opts.message.reply(chat.a.text);
@@ -268,33 +270,19 @@ const DISCORD = new Deva({
         room: packet.q.meta.params[1] || 'public',
       });
     },
-    uid(packet) {
-      return Promise.resolve(this.uid());
-    },
-    status(packet) {
-      return this.status();
-    },
-    help(packet) {
-      return new Promise((resolve, reject) => {
-        this.lib.help(packet.q.text, __dirname).then(text => {
-          return resolve({text})
-        }).catch(reject);
-      });
-    },
   },
-  async onStop(data) {
+  async onExit(data) {
     try {
-      const { personal} = this.security();
-      for (const acct of personal) {
-        await this.modules[acct.key].client.destroy();
+      for (const key in this.modules) {
+        await this.modules[key].client.destroy();
       }
     } catch (e) {
-      return this.error(e);
+      return this.error(e, data);
     } finally {
-      return this.exit(data);
+      return data;
     }
   },
-  async onInit(data) {
+  async onReady(data, resolve) {
     const { personal } = this.security();
     this.vars.active_agent = personal[0].key;
 
@@ -335,13 +323,18 @@ const DISCORD = new Deva({
         	const { commandName } = interaction;
           if (this.func[commandName]) this.func[commandName](interaction);
         });
-
+        this.prompt(`acct: ${key}`);
       }
     } catch (e) {
       return this.error(e);
     } finally {
-      return this.start(data);
+      this.prompt(this.vars.messages.ready);
+      return resolve(data);
     }
   },
+  onError(err, data, reject) {
+    console.log('error \n', err);
+    return reject(err);
+  }
 });
-module.exports = DISCORD
+export default DISCORD
