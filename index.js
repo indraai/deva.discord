@@ -3,9 +3,7 @@
 
 import Deva from '@indra.ai/deva';
 import pkg from './package.json' with {type:'json'};
-
-import data from './data.json' with {type:'json'};
-const {agent,vars} = data.DATA;
+const {agent,vars} = pkg.data;
 
 // set the __dirname
 import {dirname} from 'node:path';
@@ -194,7 +192,7 @@ const DISCORD = new Deva({
 
       channel.sendTyping();
       this.prompt(msg);
-      this.question(`${this.askChr}${opts.key} ask ${msg}`, {
+      this.question(`${this.askChr}${opts.key} ask Responding in 150 words or less write ${msg}`, {
         header,
       }).then(chat => {
         opts.message.reply(chat.a.text);

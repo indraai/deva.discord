@@ -23,8 +23,69 @@
     "url": "https://github.com/indraai/deva.discord/issues"
   },
   "dependencies": {
-    "@indra.ai/deva": "^1.4.22",
+    "@indra.ai/deva": "^1.4.23",
     "discord.js": "^14.18.0"
   },
-  "homepage": "https://deva.space/devas/discord"
+  "homepage": "https://deva.space/devas/discord",
+  "data": {
+    "agent": {
+      "id": 5594827423516,
+      "key": "discord",
+      "prompt": {
+        "emoji": "💬",
+        "text": "Discord",
+        "colors": {
+          "label": {
+            "R": 0,
+            "G": 150,
+            "B": 255
+          },
+          "text": {
+            "R": 101,
+            "G": 192,
+            "B": 255
+          }
+        }
+      },
+      "profile": {
+        "name": "Discord Deva",
+        "gender": "DEVA",
+        "pronounds": "He, Him",
+        "owner": "Quinn Michaels",
+        "creator": "Quinn Michaels",
+        "describe": "The Discord Deva manages the Discord Server features and connections for the entties in the Deva.world multi-agent system",
+        "emoji": "/public/devas/discord/emoji.png",
+        "avatar": "/public/devas/discord/avatar.png",
+        "background": "/public/devas/indra/background.jpg",
+        "voice": "ash"
+      }
+    },
+    "vars": {
+      "messages": {
+        "init": "🟠 INIT",
+        "start": "🔵 START",
+        "enter": "🟢 ENTER",
+        "stop": "🔴 STOP",
+        "exit": "🟡 EXIT",
+        "done": "🟣 DONE",
+        "error": "💣 Discord Error!",
+        "loggedout": "🛑 LOGGED OUT",
+        "send": "📜 MESSAGE SENT",
+        "ready": "⭐️ READY!"
+      },
+      "ask": {
+        "max_tokens": 150,
+        "history": []
+      },
+      "context": {
+        "uid": "generating uid",
+        "status": "getting status",
+        "info": "getting info",
+        "feature": "accessing feature",
+        "issue": "has issues",
+        "help": "asking for help"
+      },
+      "accts": {}
+    }
+  }
 }
