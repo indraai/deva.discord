@@ -124,7 +124,6 @@ const DISCORD = new Deva({
       // strange things
       return new Promise((resolve, reject) => {
         channels.forEach((channel,key) => {
-
           if (entities.mentions) entities.mentions.forEach(mention => {
             const username = mention.replace(/@/g, '').toLowerCase();
             const usernameReg = new RegExp(mention, 'g');
@@ -195,7 +194,7 @@ const DISCORD = new Deva({
       this.question(`${this.askChr}${opts.key} ask Responding in 150 words or less write ${msg}`, {
         header,
       }).then(chat => {
-        opts.message.reply(chat.a.text);
+        opts.message.reply(chat.a.data.chat.text);
       }).catch(err => {
         opts.message.reply(this.vars.messages.error);
         this.error(err, opts);
