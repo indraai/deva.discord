@@ -23,7 +23,7 @@
     "url": "https://github.com/indraai/deva.discord/issues"
   },
   "dependencies": {
-    "@indra.ai/deva": "^1.5.41",
+    "@indra.ai/deva": "^1.5.42",
     "discord.js": "^14.18.0"
   },
   "homepage": "https://deva.space/devas/discord",
